@@ -2,4 +2,4 @@ plugged
 plug-config.old
 
 # vim-plug
-autoload/plug.vim
+autoload
