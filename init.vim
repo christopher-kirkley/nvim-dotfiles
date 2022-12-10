@@ -18,6 +18,7 @@ set incsearch
 set scrolloff=8
 set colorcolumn=80
 set signcolumn=yes
+set history=20
 " " Set completeopt to have a better completion experience
 " set completeopt=menuone,noinsert,noselect
 " " Avoid showing message extra message when using completion
@@ -88,6 +89,9 @@ nnoremap <silent> <leader>bn <cmd>:bn<cr>
 nnoremap <C-j> :m .+1<CR>==
 nnoremap <C-k> :m .-2<CR>==
 
+" Toggle numbers
+nnoremap <C-N> :set invrelativenumber invnumber<CR>
+
 " " Insert mode
 " inoremap <C-j> <ESC>:m .+1<CR>==gi
 " inoremap <C-k> <ESC>:m .-2<CR>==gi
@@ -96,6 +100,8 @@ nnoremap <C-k> :m .-2<CR>==
 " vnoremap <C-j> :m '>+1<CR>gv=gv
 " vnoremap <C-k> :m '<-2<CR>gv=gv
 
+command! -range ListToKeyPairs 
+      \ execute '<line1>,<line2>s/\(.*\)\t\(.*\)/"\1": "\2",'
 
 
 
