@@ -29,7 +29,7 @@ local on_attach = function(client, bufnr)
   vim.keymap.set('n', '<space>rn', vim.lsp.buf.rename, bufopts)
   vim.keymap.set('n', '<space>ca', vim.lsp.buf.code_action, bufopts)
   vim.keymap.set('n', 'gr', vim.lsp.buf.references, bufopts)
-  vim.keymap.set('n', '<space>f', vim.lsp.buf.formatting, bufopts)
+  vim.keymap.set('n', '<space>f', vim.lsp.buf.format, bufopts)
 end
 
 local lsp_flags = {
@@ -40,7 +40,7 @@ require('lspconfig')['pyright'].setup{
     on_attach = on_attach,
     flags = lsp_flags,
 }
-require('lspconfig')['tsserver'].setup{
+require('lspconfig')['ts_ls'].setup{
     on_attach = on_attach,
     flags = lsp_flags,
 }
@@ -107,3 +107,40 @@ require('lspconfig')['tsserver'].setup{
       { name = 'cmdline' }
     })
   })
+
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = { 'javascript', 'typescriptreact', 'typescript', 'html', 'css' },
+  callback = function()
+    vim.treesitter.start()
+    vim.bo.indentexpr = "v:lua.require'nvim-treesitter.indent'.get_indent(v:lnum)"
+  end,
+})
+
+-- Diffview: branch-vs-base review (GitHub "Files changed" style)
+require('diffview').setup{}
+
+-- Detect the base branch so :ReviewBranch works in both main/ and master/ repos
+local function detect_base()
+  local candidates = { 'origin/main', 'origin/master', 'main', 'master' }
+  for _, ref in ipairs(candidates) do
+    vim.fn.system({ 'git', 'rev-parse', '--verify', '--quiet', ref })
+    if vim.v.shell_error == 0 then
+      return ref
+    end
+  end
+  return nil
+end
+
+-- :ReviewBranch opens diffview for what this branch added since the base
+-- (merge-base via the `...` range), matching GitHub PR semantics.
+vim.api.nvim_create_user_command('ReviewBranch', function()
+  local base = detect_base()
+  if not base then
+    vim.notify(
+      'ReviewBranch: no base branch found (tried origin/main, origin/master, main, master)',
+      vim.log.levels.ERROR
+    )
+    return
+  end
+  vim.cmd('DiffviewOpen ' .. base .. '...HEAD')
+end, {})

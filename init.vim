@@ -19,6 +19,8 @@ set scrolloff=8
 set colorcolumn=80
 set signcolumn=yes
 set history=20
+set clipboard=unnamedplus
+
 " " Set completeopt to have a better completion experience
 " set completeopt=menuone,noinsert,noselect
 " " Avoid showing message extra message when using completion
@@ -31,6 +33,10 @@ Plug 'tpope/vim-surround'
 Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-repeat'
+Plug 'tpope/vim-dispatch'
+
+" Prettier
+Plug 'sbdchd/neoformat'
 
 
 " LSP
@@ -51,6 +57,7 @@ Plug 'hrsh7th/nvim-cmp'
 
 " gruvbox theme
 Plug 'morhetz/gruvbox'
+Plug 'Mofiqul/dracula.nvim'
 
 " Twig
 " Plug 'lumiliet/vim-twig'
@@ -59,12 +66,16 @@ Plug 'morhetz/gruvbox'
 Plug 'nvim-lua/plenary.nvim'
 Plug 'nvim-telescope/telescope.nvim'
 
+" Diffview - branch vs base review
+Plug 'sindrets/diffview.nvim'
+Plug 'nvim-tree/nvim-web-devicons'
+
 
 " Undotree
 " Plug 'mbbill/undotree'
 
 " Treesitter
-" Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
+Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
 
 
 " " fzf
@@ -76,12 +87,19 @@ Plug 'nvim-telescope/telescope.nvim'
 call plug#end()
 
 
-colorscheme gruvbox
+colorscheme dracula
 
 let mapleader = " "
 nnoremap <leader>ff <cmd>Telescope find_files<cr>
 nnoremap <leader>fg <cmd>Telescope live_grep<cr>
 nnoremap <silent> <leader>bn <cmd>:bn<cr>
+nnoremap <leader>d :Dispatch<Space>
+
+" Diffview - review current branch vs base
+nnoremap <leader>gd <cmd>ReviewBranch<cr>
+nnoremap <leader>gD :DiffviewOpen<Space>
+nnoremap <leader>gh <cmd>DiffviewFileHistory %<cr>
+nnoremap <leader>gc <cmd>DiffviewClose<cr>
 
 
 
@@ -125,11 +143,29 @@ lua require('init')
 
 " INDENTS
 " autocmd Filetype javascript setlocal ts=4 sw=4 sts=4 expandtab
-autocmd FileType javascript setlocal shiftwidth=2 tabstop=2
+autocmd FileType javascript,typescriptreact setlocal shiftwidth=2 tabstop=2 expandtab autoindent
 autocmd Filetype html setlocal ts=2 sw=2 sts=2
 autocmd Filetype *.twig setlocal ts=2 sw=2 sts=2
 autocmd Filetype php setlocal ts=4 sw=4 sts=4 expandtab
 autocmd BufRead,BufNewFile *.css setlocal tabstop=2 shiftwidth=2 softtabstop=2
+
+" Prettier
+
+let g:neoformat_javascript_prettier = {
+    \ 'exe': 'prettier',
+    \ 'args': ['--stdin-filepath', '%:p'],
+    \ 'stdin': 1
+    \ }
+let g:neoformat_typescriptreact_prettier = {
+    \ 'exe': 'prettier',
+    \ 'args': ['--stdin-filepath', '%:p'],
+    \ 'stdin': 1
+    \ }
+let g:neoformat_enabled_typescriptreact = ['prettier']
+autocmd BufWritePre *.js,*.tsx Neoformat
+
+
+
 
 
 
