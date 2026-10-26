@@ -3,3 +3,6 @@ plug-config.old
 
 # vim-plug
 autoload
+
+# local docs/specs
+docs
